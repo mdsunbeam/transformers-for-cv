@@ -1,7 +1,7 @@
 from typing import Tuple, Optional, Dict, Any
 
 import torch 
-from lightning import LightningDataModule 
+from pytorch_lightning import LightningDataModule 
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 from torchvision.datasets import MNIST 
 from torchvision.transforms import transforms 
@@ -30,7 +30,7 @@ class MNISTDataModule(LightningDataModule):
     
         # transforms
         self.transforms = transforms.Compose(
-            [transforms.ToTensor(), transforms.Nomralize((0.1307,), (0.3081,))]
+            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
         )
 
         self.data_train: Optional[Dataset] = None
