@@ -82,4 +82,41 @@ class MNISTLitModule(LightningModule):
             self.val_acc(preds, targets)
             self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
             self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
-            
+
+        def on_validation_epoch_end(self):
+            acc = self.val_acc.compute()
+            self.best_val_acc(acc)
+            self.log("val/best_acc", self.best_val_acc.compute(), sync_dist=True, prog_bar=True)
+
+        def test_step(self, batch: Any, batch_idx: int):
+            loss, preds, targets = self.model_step(batch)
+
+            # update metrics
+            self.test_loss(loss)
+            self.test_acc(preds, targets)
+            self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
+            self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
+
+        def on_test_epoch_end(self):
+            pass
+
+        def configure_optimizers(self):
+            optimizer = self.optimizer(params=self.parameters())
+            if self.scheduler is not None:
+                scheduler = self.scheduler(optimizer=optimizer)
+                return {
+                    "optimizer": optimizer,
+                    "lr_scheduler": {
+                        "scheduler": scheduler,
+                        "monitor": "val/loss",
+                        "interval": "epoch",
+                        "frequency": 1,
+                    },
+                }
+            return {"optimizer": optimizer}
+        
+if __name__ == "__main__":
+    _ = MNISTLitModule(None, None, None)
+
+
+
