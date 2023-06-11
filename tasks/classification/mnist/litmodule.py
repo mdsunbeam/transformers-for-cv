@@ -28,7 +28,7 @@ class MNISTLitModule(LightningModule):
 
         self.net = net
 
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion = torch.nn.NLLLoss()
 
         # metrics across batches
         self.train_acc = Accuracy(task="multiclass", num_classes=10)
